@@ -6,10 +6,10 @@ export class CustomMap {
 
     constructor(element: Element) {
         this.googleMap = new google.maps.Map(element, {
-            zoom: 1,
+            zoom: 18,
             center: {
-                lat: 0,
-                lng: 0,
+                lat: 47.91327,
+                lng: 106.910489,
             },
         });
     }

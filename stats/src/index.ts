@@ -1,80 +1,31 @@
+import { CsvFileReader } from './CsvFileReader';
 import { MatchReader } from './MatchReader';
-import { MatchResultEnum } from './MatchResult';
+import { ConsoleReport } from './report/ConsoleReport';
+import { WinsAnalysis } from './analyzers/WinsAnalysis';
+import { Summary } from './Summary';
+import { HtmlReport } from './report/HtmlReport';
 
-const reader = new MatchReader('football.csv');
-reader.read();
-const matches = reader.data;
+// const reader = new CsvFileReader('football.csv');
+// reader.read();
 
-//lets count how many wins manutd has
-let manUnitedWins = 0;
+//Create an object that satifsies the 'DataReader' interface
+const csvFileReader = new CsvFileReader('football.csv');
 
-for (let match of matches) {
-    if (match[1] === 'Man United' && match[5] === 'H') {
-        manUnitedWins++;
-    } else if (match[2] === 'Man United' && match[5] === 'A') {
-        manUnitedWins++;
-    }
-}
+//Create an instance of matchReader and pass in something satisfying
+// the 'DataReader' interface
 
-console.log(`Man United won ${manUnitedWins} games`);
+const matchReader = new MatchReader(csvFileReader);
+matchReader.load();
 
-//we will parse matches into two dimensional arrays of array
+const summary = new Summary(new WinsAnalysis('Man United'), new ConsoleReport());
+summary.buildAndPrintReport(matchReader.matches);
 
-// console.log(matches);
+const summary1 = new Summary(new WinsAnalysis('Man United'), new HtmlReport());
+summary1.buildAndPrintReport(matchReader.matches);
 
-//Above solution is a bare minimum solution
-//lets improve the solutions
+//static methods
 
-//at least we can declare 'H' and 'A'
-
-const homeWin = 'H';
-const awayWin = 'A';
-
-//in the future we are going to consider 'D' for draw
-//so we arent fully implement the solution
-
-const draw = 'D';
-//after this draw is faded because doesnt used
-//other collegues might be delete it
-
-manUnitedWins = 0;
-
-for (let match of matches) {
-    if (match[1] === 'Man United' && match[5] === homeWin) {
-        manUnitedWins++;
-    } else if (match[2] === 'Man United' && match[5] === awayWin) {
-        manUnitedWins++;
-    }
-}
-
-console.log(`Man United won ${manUnitedWins} games`);
-
-//its not good solution neither
-//so lets consider Object of Match result
-
-const MatchResult = {
-    HomeWin: 'H',
-    AwayWin: 'A',
-    Draw: 'D',
-};
-
-//but i feel its not the best in TS
-//enums - enumeration
-//moved to new file MatchResult
-//one of the feature is we can use it as return type
-const printMatchResult = (match: string[]): MatchResultEnum => {
-    if (match[5] === 'H') return MatchResultEnum.HomeWin;
-    return MatchResultEnum.AwayWin;
-};
-
-manUnitedWins = 0;
-
-for (let match of matches) {
-    if (match[1] === 'Man United' && match[5] === MatchResultEnum.HomeWin) {
-        manUnitedWins++;
-    } else if (match[2] === 'Man United' && match[5] === MatchResultEnum.AwayWin) {
-        manUnitedWins++;
-    }
-}
-
-console.log(`Man United won ${manUnitedWins} games`);
+const matchReader1 = MatchReader.fromCsv('football.csv');
+matchReader1.load();
+const summary2 = Summary.winAnalysisWithHtmlReport('Man United');
+summary2.buildAndPrintReport(matchReader.matches);

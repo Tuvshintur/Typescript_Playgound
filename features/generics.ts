@@ -57,3 +57,39 @@ printAnything(['a', 'b', 'c']);
 
 //One last thing don't forget function return type
 //it will saves us from errors
+
+// Generic constraints
+
+class Car {
+    print() {
+        console.log('I am a car!');
+    }
+}
+
+class House {
+    print() {
+        console.log('I am a house');
+    }
+}
+
+// function printHousesOrCars<T>(arr: T[]): void {
+//     for (let i = 0; i < arr.length; i++) {
+//         arr[i].print();
+//     }
+// }
+
+//Simply it will throw error because
+//there are no guarantee to have print method
+//this is time to use generic constraints
+interface Printable {
+    print(): void;
+}
+
+function printHousesOrCars<T extends Printable>(arr: T[]): void {
+    for (let i = 0; i < arr.length; i++) {
+        arr[i].print();
+    }
+}
+
+printHousesOrCars([new Car(), new Car()]);
+printHousesOrCars([new House(), new House()]);

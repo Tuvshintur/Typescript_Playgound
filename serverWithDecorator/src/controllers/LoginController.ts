@@ -1,9 +1,21 @@
-import { Request, Response } from 'express';
-import { get, controller } from './decorators';
+import { Request, Response, NextFunction } from 'express';
+import { get, controller, use, bodyValidator, post } from './decorators';
+
+function logger(req: Request, res: Response, next: NextFunction): void {
+    console.log('Request was made!!!');
+    next();
+}
 
 @controller('/auth')
 class LoginController {
+    //Without RouteHandlerDescriptor interface it can works fine
+    // @get('/')
+    // add(a: number, b: number): number {
+    //     return a + b;
+    // }
+
     @get('/login')
+    @use(logger)
     getLogin(req: Request, res: Response): void {
         res.send(`
             <form method="post">
@@ -19,5 +31,25 @@ class LoginController {
                 <button type="submit">Submit</button>
             </form>
         `);
+    }
+
+    @post('/login')
+    @bodyValidator('email', 'password')
+    postLogin(req: Request, res: Response) {
+        const { email, password } = req.body;
+
+        if (email && password && email === 'test@test.com' && password === 'password') {
+            req.session = { loggedIn: true };
+            res.redirect('/');
+        } else {
+            res.send('Invalid email or password');
+        }
+    }
+
+    @get('/logout')
+    getLogout(req: Request, res: Response) {
+        req.session = null;
+
+        res.redirect('/');
     }
 }
